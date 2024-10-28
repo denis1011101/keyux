@@ -56,6 +56,56 @@ test('adds menu navigation', () => {
   equal(window.document.activeElement, items[0])
 })
 
+test('adds focusgroup navigation', () => {
+  let window = new JSDOM().window
+  startKeyUX(window, [focusGroupKeyUX()])
+
+  window.document.body.innerHTML =
+    '<div focusgroup="true">' +
+    '<a href="#" focusgroup="item">Home</a>' +
+    '<a href="#" focusgroup="item">About</a>' +
+    '<a href="#" focusgroup="item">Contact</a>' +
+    '</div>'
+  let items = window.document.querySelectorAll('a')
+  items[0].focus()
+
+  equal(window.document.activeElement, items[0])
+  equal(
+    window.document.body.innerHTML,
+    '<div focusgroup="true">' +
+      '<a href="#" focusgroup="item">Home</a>' +
+      '<a href="#" focusgroup="item" tabindex="-1">About</a>' +
+      '<a href="#" focusgroup="item" tabindex="-1">Contact</a>' +
+      '</div>'
+  )
+
+  press(window, 'ArrowDown')
+  equal(window.document.activeElement, items[1])
+  equal(
+    window.document.body.innerHTML,
+    '<div focusgroup="true">' +
+      '<a href="#" focusgroup="item" tabindex="-1">Home</a>' +
+      '<a href="#" focusgroup="item" tabindex="0">About</a>' +
+      '<a href="#" focusgroup="item" tabindex="-1">Contact</a>' +
+      '</div>'
+  )
+
+  press(window, 'ArrowUp')
+  equal(window.document.activeElement, items[0])
+
+  press(window, 'End')
+  equal(window.document.activeElement, items[2])
+
+  press(window, 'Home')
+  equal(window.document.activeElement, items[0])
+
+  press(window, 'ArrowUp')
+  equal(window.document.activeElement, items[2])
+
+  press(window, 'ArrowDown')
+  equal(window.document.activeElement, items[0])
+})
+
 test('stops tacking on loosing focus', () => {
   let window = new JSDOM().window
   startKeyUX(window, [focusGroupKeyUX()])
@@ -146,6 +196,51 @@ test('supports horizontal menus', () => {
   equal(window.document.activeElement, items[0])
 })
 
+test('supports horizontal focusgroups', () => {
+  let window = new JSDOM().window
+  let items
+  startKeyUX(window, [focusGroupKeyUX()])
+
+  window.document.body.innerHTML =
+    '<div focusgroup="horizontal">' +
+    '<a href="#" focusgroup="item">Home</a>' +
+    '<a href="#" focusgroup="item">About</a>' +
+    '<a href="#" focusgroup="item">Contact</a>' +
+    '</div>'
+  items = window.document.querySelectorAll('a')
+  items[0].focus()
+  press(window, 'ArrowRight')
+  equal(window.document.activeElement, items[1])
+  press(window, 'ArrowLeft')
+  equal(window.document.activeElement, items[0])
+
+  window.document.body.innerHTML =
+    '<div focusgroup="vertical">' +
+    '<a href="#" focusgroup="item">Home</a>' +
+    '<a href="#" focusgroup="item">About</a>' +
+    '<a href="#" focusgroup="item">Contact</a>' +
+    '</div>'
+  items = window.document.querySelectorAll('a')
+  items[0].focus()
+  press(window, 'ArrowDown')
+  equal(window.document.activeElement, items[1])
+  press(window, 'ArrowUp')
+  equal(window.document.activeElement, items[0])
+
+  window.document.body.innerHTML =
+    '<div focusgroup="broken-bad-orientation">' +
+    '<a href="#" focusgroup="item">Home</a>' +
+    '<a href="#" focusgroup="item">About</a>' +
+    '<a href="#" focusgroup="item">Contact</a>' +
+    '</div>'
+  items = window.document.querySelectorAll('a')
+  items[0].focus()
+  press(window, 'ArrowDown')
+  equal(window.document.activeElement, items[1])
+  press(window, 'ArrowUp')
+  equal(window.document.activeElement, items[0])
+})
+
 test('moves focus by typing item name', async () => {
   let window = new JSDOM().window
   startKeyUX(window, [
@@ -209,6 +304,27 @@ test('supports RTL locales', () => {
     '<a href="#" role="menuitem">About</a>' +
     '<a href="#" role="menuitem">Contact</a>' +
     '</nav>'
+  let items = window.document.querySelectorAll('a')
+  items[0].focus()
+
+  press(window, 'ArrowLeft')
+  equal(window.document.activeElement, items[1])
+
+  press(window, 'ArrowRight')
+  equal(window.document.activeElement, items[0])
+})
+
+test('supports RTL locales for focusgroups', () => {
+  let window = new JSDOM().window
+  startKeyUX(window, [focusGroupKeyUX()])
+
+  window.document.dir = 'rtl'
+  window.document.body.innerHTML =
+    '<div focusgroup="horizontal">' +
+    '<a href="#" focusgroup="item">Home</a>' +
+    '<a href="#" focusgroup="item">About</a>' +
+    '<a href="#" focusgroup="item">Contact</a>' +
+    '</div>'
   let items = window.document.querySelectorAll('a')
   items[0].focus()
 

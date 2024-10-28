@@ -381,6 +381,16 @@ const Toolbar: FC = () => {
   )
 }
 
+const FocusGroupExample: FC = () => {
+  return (
+    <div focusgroup="true">
+      <a href="#" focusgroup="item">Home</a>
+      <a href="#" focusgroup="item">About</a>
+      <a href="#" focusgroup="item">Contact</a>
+    </div>
+  )
+}
+
 const App: FC = () => {
   let [, setUpdate] = useState({})
   let [router, setRouter] = useState('home')
@@ -399,6 +409,7 @@ const App: FC = () => {
       />
       <Tabs />
       <Toolbar />
+      <FocusGroupExample />
     </>
   )
 }
