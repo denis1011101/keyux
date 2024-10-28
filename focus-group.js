@@ -17,7 +17,11 @@ function findGroupNodeByEventTarget(target) {
   if (!itemRole) return null
 
   let groupRoles = ROLES[itemRole.toLowerCase()]
-  if (!groupRoles) return null
+  if (!groupRoles) {
+    let focusGroup = target.closest('[focusgroup]')
+    if (focusGroup) return focusGroup
+    return null
+  }
 
   for (let role of groupRoles) {
     let node = target.closest(`[role=${role}]`)
@@ -27,6 +31,7 @@ function findGroupNodeByEventTarget(target) {
 
 function getItems(target, group) {
   if (group.role === 'toolbar') return getToolbarItems(group)
+  if (group.hasAttribute('focusgroup')) return group.querySelectorAll('[focusgroup]')
   return group.querySelectorAll(`[role=${target.role}]`)
 }
 
@@ -48,7 +53,9 @@ function isHorizontalOrientation(group) {
   if (ariaOrientation === 'horizontal') return true
 
   let role = group.role
-  return role === 'menubar' || role === 'tablist' || role === 'toolbar'
+  if (role === 'menubar' || role === 'tablist' || role === 'toolbar') return true
+
+  return group.hasAttribute('focusgroup') && group.getAttribute('focusgroup') === 'horizontal'
 }
 
 export function focusGroupKeyUX(options) {
